@@ -2,26 +2,26 @@ import pyaudio
 import wave
 import sys
 
-filename = sys.argv[1]
+CHUNK = 1024
 
-chunk = 1024
-
-wf = wave.open(filename, 'rb')
-
-p = pyaudio.PyAudio()
-
-stream = p.open(
-    format = p.get_format_from_width(wf.getsampwidth()),
-    channels = wf.getnchannels(),
-    rate = wf.getframerate(),
-    output = True
-)
-
-data = wf.readframes(chunk)
-
-while data != b'':
-    stream.write(data)
-    data = wf.readframes(chunk)
+if len(sys.argv) < 2:
+    print(f"Plays a wav file. Usage: `python {sys.argv[0]} filename.wav`")
+    sys.exit(-1)
     
-stream.close()
-p.terminate()
+filename = sys.argv[1]
+    
+with wave.open(filename, 'rb') as wf:
+    # Instantiate PyAudio and initialize PortAudio system resources
+    p = pyaudio.PyAudio()
+    
+    stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                    channels=wf.getnchannels(),
+                    rate=wf.getframerate(),
+                    output=True)
+
+    while len(data := wf.readframes(CHUNK)):
+        stream.write(data)
+    
+    
+    stream.close()
+    p.terminate()
