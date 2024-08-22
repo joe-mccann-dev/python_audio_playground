@@ -1,22 +1,33 @@
+import os
 import pyaudio
 import wave
+import sys
 
-chunk = 1024
-sample_format = pyaudio.paInt16
-channels = 1
-fs = 44100
-seconds = 10
-filename = 'audio_files/output.wav'
+CHUNK = 1024
+SAMPLE_FORMAT = pyaudio.paInt16
+CHANNELS = 1
+FS = 44100
+SECONDS = 10
+
+if len(sys.argv) < 2:
+    print(f"Records a stream to wav. Usage: `python {sys.argv[0]} output_filename.wav`")
+    sys.exit(-1)
+    
+audio_dir = r'./audio_files'
+if not os.path.exists(audio_dir):
+    os.makedirs(audio_dir)
+    
+FILENAME = f'{audio_dir}/{sys.argv[1]}'
 
 p = pyaudio.PyAudio()
 
 print('Recording audio . . .')
 
 stream = p.open(
-    format=sample_format,
-    channels=channels,
-    rate=fs,
-    frames_per_buffer=chunk,
+    format=SAMPLE_FORMAT,
+    channels=CHANNELS,
+    rate=FS,
+    frames_per_buffer=CHUNK,
     input=True,
     # my microphone is 1, audio interface is 2
     input_device_index=2
@@ -24,19 +35,18 @@ stream = p.open(
 
 frames = []
 
-for i in range(0, int(fs / chunk * seconds)):
-    data = stream.read(chunk)
+for i in range(0, int(FS / CHUNK * SECONDS)):
+    data = stream.read(CHUNK)
     frames.append(data)
     
 stream.stop_stream()
 stream.close()
 p.terminate()
 
+with wave.open(FILENAME, 'wb') as wf:
+    wf.setnchannels(CHANNELS)
+    wf.setsampwidth(p.get_sample_size(SAMPLE_FORMAT))
+    wf.setframerate(FS)
+    wf.writeframes(b''.join(frames))
+    
 print('Finished recording audio.')
-
-wf = wave.open(filename, 'wb')
-wf.setnchannels(channels)
-wf.setsampwidth(p.get_sample_size(sample_format))
-wf.setframerate(fs)
-wf.writeframes(b''.join(frames))
-wf.close()

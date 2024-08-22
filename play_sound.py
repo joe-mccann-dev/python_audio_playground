@@ -8,9 +8,9 @@ if len(sys.argv) < 2:
     print(f"Plays a wav file. Usage: `python {sys.argv[0]} filename.wav`")
     sys.exit(-1)
     
-filename = sys.argv[1]
+FILENAME = sys.argv[1]
     
-with wave.open(filename, 'rb') as wf:
+with wave.open(FILENAME, 'rb') as wf:
     # Instantiate PyAudio and initialize PortAudio system resources
     p = pyaudio.PyAudio()
     
