@@ -10,9 +10,6 @@ filename = 'audio_files/output.wav'
 
 p = pyaudio.PyAudio()
 
-for i in range(p.get_device_count()):
-    print(p.get_device_info_by_index(i))
-
 print('Recording audio . . .')
 
 stream = p.open(
@@ -21,6 +18,7 @@ stream = p.open(
     rate=fs,
     frames_per_buffer=chunk,
     input=True,
+    # my microphone is 1, audio interface is 2
     input_device_index=2
 )
 
